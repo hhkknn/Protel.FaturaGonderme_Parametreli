@@ -103,13 +103,18 @@ namespace SendInvoice
 
                 if (bastar != "" && !bastar.Contains("1900"))
                 {
-                    ((SAPbouiCOM.EditText)oform.Items.Item("Item_1").Specific).Value = bastar;
+                    if (DateTime.TryParse(bastar, out var dtBas))
+                        ((SAPbouiCOM.EditText)oform.Items.Item("Item_1").Specific).Value = dtBas.ToString("yyyyMMdd");
+                    //((SAPbouiCOM.EditText)oform.Items.Item("Item_1").Specific).Value = bastar;
+
                 }
 
 
                 if (bittar != "" && !bittar.Contains("1900"))
                 {
-                    ((SAPbouiCOM.EditText)oform.Items.Item("Item_3").Specific).Value = bittar;
+                    if (DateTime.TryParse(bittar, out var dtBit))
+                        ((SAPbouiCOM.EditText)oform.Items.Item("Item_3").Specific).Value = dtBit.ToString("yyyyMMdd");
+                    //((SAPbouiCOM.EditText)oform.Items.Item("Item_3").Specific).Value = bittar;
                 }
 
                 ((SAPbouiCOM.EditText)oform.Items.Item("Item_101").Specific).Value = kulkodu;
