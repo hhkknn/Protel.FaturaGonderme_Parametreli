@@ -125,14 +125,14 @@ namespace SendInvoice
                     {
                         oComboBelgeTipi.Select("F", SAPbouiCOM.BoSearchKey.psk_ByValue);
                         sendinvoiceekrani = true;
-                        oform.Items.Item("Item_5").Click();
+                        oform.Items.Item("Item_5").Click();//listele butonu
                         sendinvoiceekrani = false;
                     }
                     else if (h == 2)
                     {
                         oComboBelgeTipi.Select("A", SAPbouiCOM.BoSearchKey.psk_ByValue);
                         sendinvoiceekrani = true;
-                        oform.Items.Item("Item_5").Click();
+                        oform.Items.Item("Item_5").Click(); //listele butonu 
                         sendinvoiceekrani = false;
                     }
 
@@ -161,7 +161,7 @@ namespace SendInvoice
                         if (oComboBelgeTipi.Value.Trim() == "F")
                         {
 
-                            ((SAPbouiCOM.ComboBox)oMatrix.Columns.Item("Col_3").Cells.Item(i).Specific).Select(fatserisi, SAPbouiCOM.BoSearchKey.psk_ByDescription);
+                            ((SAPbouiCOM.ComboBox)oMatrix.Columns.Item("Col_3").Cells.Item(i).Specific).Select(fatserisi, SAPbouiCOM.BoSearchKey.psk_ByDescription);// burada seri ön eki codu basılmalı 2 gibi otomatik gönderme parametre ekranından.
                         }
                         else if (oComboBelgeTipi.Value.Trim() == "A")
                         {
@@ -169,16 +169,16 @@ namespace SendInvoice
 
                         }
 
-                        ((SAPbouiCOM.CheckBox)oMatrix.Columns.Item("#").Cells.Item(i).Specific).Caption = "Y";
+                        ((SAPbouiCOM.CheckBox)oMatrix.Columns.Item("#").Cells.Item(i).Specific).Caption = "Y";//seçme işlemi
                         isSend = true;
                     }
                     //}
 
                     sendinvoiceekrani = true;
                     if (isSend)   //Matrix içerisinde işaretlenmiş bir satır yoksa gönder tuşuna basılmıyor.
-                                  //oform.Items.Item("Item_6").Click();
+                        oform.Items.Item("Item_6").Click(); // fatura gönder butonu.
 
-                        isSend = false;
+                    isSend = false;
                     sendinvoiceekrani = false;
                 }
 
