@@ -58,26 +58,21 @@ namespace SendInvoice
         {
             try
             {
-                string cari = "";
-                bool isSend = false;
-                SAPbouiCOM.DataTable oDataInvoice = null;
                 SAPbobsCOM.Recordset oRS = (SAPbobsCOM.Recordset)oCompanyObject.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
                 SAPbobsCOM.Recordset oRS_1 = (SAPbobsCOM.Recordset)oCompanyObject.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
                 SAPbobsCOM.Recordset oRS_2 = (SAPbobsCOM.Recordset)oCompanyObject.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
                 SAPbobsCOM.Recordset oRS_3 = (SAPbobsCOM.Recordset)oCompanyObject.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
                 SAPbobsCOM.Recordset oRS_4 = (SAPbobsCOM.Recordset)oCompanyObject.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset);
-                string vergiNo = ""; string tabloadi = ""; string belgeno = "";
-                string type = "";
-                string alias = "";
+
                 if (faturagondermeislemicalisiyor)
                 {
                     return;
                 }
+
                 faturagondermeislemicalisiyor = true;
-                SAPbouiCOM.Framework.Application.SBO_Application.ActivateMenuItem("DonusumOne.SendInvoice");
 
+                
                 string sql = "Select ISNULL(\"U_BasTar\",'1900-01-01') as BasTar,ISNULL(\"U_BitTar\",'1900-01-01') as BitTar,* from \"@DON_OTOPARAM\" ";
-
                 oRS_4.DoQuery(sql);
 
                 string kulkodu = "";
@@ -90,120 +85,122 @@ namespace SendInvoice
 
                 if (kulkodu == "")
                 {
+                    faturagondermeislemicalisiyor = false;
                     return;
                 }
+
                 fatserisi = oRS_4.Fields.Item("U_FatSeri").Value.ToString();
                 arsivserisi = oRS_4.Fields.Item("U_ArsivSeri").Value.ToString();
                 bastar = oRS_4.Fields.Item("BasTar").Value.ToString();
                 bittar = oRS_4.Fields.Item("BitTar").Value.ToString();
 
-                SAPbouiCOM.Form oform = SAPbouiCOM.Framework.Application.SBO_Application.Forms.ActiveForm;
-                SAPbouiCOM.Matrix oMatrix = (SAPbouiCOM.Matrix)oform.Items.Item("Item_4").Specific;
-                SAPbouiCOM.ComboBox oComboBelgeTipi = (SAPbouiCOM.ComboBox)oform.Items.Item("Item_40").Specific;
-                SAPbouiCOM.ComboBox oComboSube = (SAPbouiCOM.ComboBox)oform.Items.Item("Item_47").Specific;
-
-                if (bastar != "" && !bastar.Contains("1900"))
-                {
-                    if (DateTime.TryParse(bastar, out var dtBas))
-                        ((SAPbouiCOM.EditText)oform.Items.Item("Item_1").Specific).Value = dtBas.ToString("yyyyMMdd");
-                    //((SAPbouiCOM.EditText)oform.Items.Item("Item_1").Specific).Value = bastar;
-
-                }
-
-
-                if (bittar != "" && !bittar.Contains("1900"))
-                {
-                    if (DateTime.TryParse(bittar, out var dtBit))
-                        ((SAPbouiCOM.EditText)oform.Items.Item("Item_3").Specific).Value = dtBit.ToString("yyyyMMdd");
-                    //((SAPbouiCOM.EditText)oform.Items.Item("Item_3").Specific).Value = bittar;
-                }
                 List<string> kulKodlari = kulkodu
-               .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
-               .Select(x => x.Trim())
-               .Where(x => !string.IsNullOrEmpty(x))
-               .ToList();
+                    .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(x => x.Trim())
+                    .Where(x => !string.IsNullOrEmpty(x))
+                    .ToList();
 
                 foreach (string kulKod in kulKodlari)
                 {
-                    ((SAPbouiCOM.EditText)oform.Items.Item("Item_101").Specific).Value = kulKod;
-
-
-
-                    for (int h = 1; h <= 2; h++)
+                    try
                     {
-                        if (h == 1)
+                        // Her kullanıcı için formu YENİDEN aç
+                        SAPbouiCOM.Framework.Application.SBO_Application.ActivateMenuItem("DonusumOne.SendInvoice");
+
+                        // Form referanslarını her iterasyonda YENİDEN al
+                        SAPbouiCOM.Form oform = SAPbouiCOM.Framework.Application.SBO_Application.Forms.ActiveForm;
+                        SAPbouiCOM.Matrix oMatrix = (SAPbouiCOM.Matrix)oform.Items.Item("Item_4").Specific;
+                        SAPbouiCOM.ComboBox oComboBelgeTipi = (SAPbouiCOM.ComboBox)oform.Items.Item("Item_40").Specific;
+                        SAPbouiCOM.ComboBox oComboSube = (SAPbouiCOM.ComboBox)oform.Items.Item("Item_47").Specific;
+
+                        
+                        if (bastar != "" && !bastar.Contains("1900"))
                         {
-                            oComboBelgeTipi.Select("F", SAPbouiCOM.BoSearchKey.psk_ByValue);
-                            sendinvoiceekrani = true;
-                            oform.Items.Item("Item_5").Click();//listele butonu
-                            sendinvoiceekrani = false;
+                            if (DateTime.TryParse(bastar, out var dtBas))
+                                ((SAPbouiCOM.EditText)oform.Items.Item("Item_1").Specific).Value = dtBas.ToString("yyyyMMdd");
                         }
-                        else if (h == 2)
+
+                        if (bittar != "" && !bittar.Contains("1900"))
                         {
-                            oComboBelgeTipi.Select("A", SAPbouiCOM.BoSearchKey.psk_ByValue);
-                            sendinvoiceekrani = true;
-                            oform.Items.Item("Item_5").Click(); //listele butonu 
-                            sendinvoiceekrani = false;
+                            if (DateTime.TryParse(bittar, out var dtBit))
+                                ((SAPbouiCOM.EditText)oform.Items.Item("Item_3").Specific).Value = dtBit.ToString("yyyyMMdd");
                         }
 
-                        if (oMatrix.RowCount == 0)
+                        ((SAPbouiCOM.EditText)oform.Items.Item("Item_101").Specific).Value = kulKod;
+
+                        // isSend her iterasyonda sıfırlanmalı
+                        bool isSend = false;
+
+                        for (int h = 1; h <= 2; h++)
                         {
-                            continue;
-                        }
-                        string vatiduncmp = "";
-                        for (int i = 1; i <= oMatrix.RowCount; i++) //Faturaları gönderir.
-                        {
-                            cari = ((SAPbouiCOM.EditText)oMatrix.Columns.Item("Col_0").Cells.Item(i).Specific).Value.ToString();
-                            tabloadi = ((SAPbouiCOM.EditText)oMatrix.Columns.Item("Col_19").Cells.Item(i).Specific).Value;
-                            belgeno = ((SAPbouiCOM.EditText)oMatrix.Columns.Item("Col_2").Cells.Item(i).Specific).Value;
-
-
-                            sql = "Select \"U_AIF_DOC_OrdType\" from [" + tabloadi + "] where \"DocEntry\" = '" + belgeno + "'";
-
-
-                            oRS_3.DoQuery(sql);
-
-                            //string seri1 = "PRB" + DateTime.Now.Year.ToString();
-                            //if (oRS_3.Fields.Item("U_AIF_DOC_OrdType").Value.ToString() == "3")
-                            //{
-                            //    ((SAPbouiCOM.ComboBox)oMatrix.Columns.Item("Col_3").Cells.Item(i).Specific).Select(seri1, SAPbouiCOM.BoSearchKey.psk_ByDescription);
-                            //}
-                            if (oComboBelgeTipi.Value.Trim() == "F")
+                            if (h == 1)
                             {
-
-                                ((SAPbouiCOM.ComboBox)oMatrix.Columns.Item("Col_3").Cells.Item(i).Specific).Select(fatserisi, SAPbouiCOM.BoSearchKey.psk_ByDescription);// burada seri ön eki codu basılmalı 2 gibi otomatik gönderme parametre ekranından.
+                                oComboBelgeTipi.Select("F", SAPbouiCOM.BoSearchKey.psk_ByValue);
+                                sendinvoiceekrani = true;
+                                oform.Items.Item("Item_5").Click(); // listele butonu
+                                sendinvoiceekrani = false;
                             }
-                            else if (oComboBelgeTipi.Value.Trim() == "A")
+                            else if (h == 2)
                             {
-                                ((SAPbouiCOM.ComboBox)oMatrix.Columns.Item("Col_3").Cells.Item(i).Specific).Select(arsivserisi, SAPbouiCOM.BoSearchKey.psk_ByDescription);
-
+                                oComboBelgeTipi.Select("A", SAPbouiCOM.BoSearchKey.psk_ByValue);
+                                sendinvoiceekrani = true;
+                                oform.Items.Item("Item_5").Click(); // listele butonu
+                                sendinvoiceekrani = false;
                             }
 
-                            ((SAPbouiCOM.CheckBox)oMatrix.Columns.Item("#").Cells.Item(i).Specific).Caption = "Y";//seçme işlemi
-                            isSend = true;
+                            if (oMatrix.RowCount == 0)
+                            {
+                                continue;
+                            }
+
+                            for (int i = 1; i <= oMatrix.RowCount; i++) // Faturaları gönderir.
+                            {
+                                string cari = ((SAPbouiCOM.EditText)oMatrix.Columns.Item("Col_0").Cells.Item(i).Specific).Value.ToString();
+                                string tabloadi = ((SAPbouiCOM.EditText)oMatrix.Columns.Item("Col_19").Cells.Item(i).Specific).Value;
+                                string belgeno = ((SAPbouiCOM.EditText)oMatrix.Columns.Item("Col_2").Cells.Item(i).Specific).Value;
+
+                                sql = "Select \"U_AIF_DOC_OrdType\" from [" + tabloadi + "] where \"DocEntry\" = '" + belgeno + "'";
+                                oRS_3.DoQuery(sql);
+
+                                if (oComboBelgeTipi.Value.Trim() == "F")
+                                {
+                                    ((SAPbouiCOM.ComboBox)oMatrix.Columns.Item("Col_3").Cells.Item(i).Specific).Select(fatserisi, SAPbouiCOM.BoSearchKey.psk_ByDescription);
+                                }
+                                else if (oComboBelgeTipi.Value.Trim() == "A")
+                                {
+                                    ((SAPbouiCOM.ComboBox)oMatrix.Columns.Item("Col_3").Cells.Item(i).Specific).Select(arsivserisi, SAPbouiCOM.BoSearchKey.psk_ByDescription);
+                                }
+
+                                ((SAPbouiCOM.CheckBox)oMatrix.Columns.Item("#").Cells.Item(i).Specific).Caption = "Y"; // seçme işlemi
+                                isSend = true;
+                            }
+
+                            sendinvoiceekrani = true;
+                            if (isSend) // Matrix içerisinde işaretlenmiş bir satır yoksa gönder tuşuna basılmıyor.
+                                oform.Items.Item("Item_6").Click(); // fatura gönder butonu.
+
+                            isSend = false;
+                            sendinvoiceekrani = false;
                         }
-                        //}
 
-                        sendinvoiceekrani = true;
-                        if (isSend)   //Matrix içerisinde işaretlenmiş bir satır yoksa gönder tuşuna basılmıyor.
-                            oform.Items.Item("Item_6").Click(); // fatura gönder butonu.
-
-                        isSend = false;
+                        // Her kullanıcı işlemi bittikten sonra formu kapat
+                        try
+                        {
+                            oform.Close();
+                        }
+                        catch (Exception exClose)
+                        {
+                            // Form kapatma hatası yoksayılır, bir sonraki kullanıcıya geçilir
+                        }
+                    }
+                    catch (Exception exKulKod)
+                    {
+                        // Tek bir kullanıcı kodu hata verse bile diğerleri çalışmaya devam eder
                         sendinvoiceekrani = false;
                     }
-
-                
                 }
 
-                try//ekran kapatma işlemi foreach içinde olduğunda hep ilk kullanıcı kodu için aramaya yapıyordu önüne geçmek için foreach dışına alındı.
-                {
-                    faturagondermeislemicalisiyor = false;
-                    oform.Close();
-                }
-                catch (Exception ex)
-                {
-                    faturagondermeislemicalisiyor = false;
-                }
+                faturagondermeislemicalisiyor = false;
             }
             catch (Exception ex)
             {
@@ -216,7 +213,6 @@ namespace SendInvoice
             switch (EventType)
             {
                 case SAPbouiCOM.BoAppEventTypes.aet_ShutDown:
-                    //Exit Add-On
                     System.Windows.Forms.Application.Exit();
                     break;
 
